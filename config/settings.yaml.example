@@ -1,0 +1,16 @@
+# codedamon (コードだもん) configuration
+# Copy this file to settings.yaml and edit as needed.
+# Restart the server after changes.
+
+# Server
+port: 3456
+cwd: /path/to/your/project
+
+# Permission mode default ("default" | "plan" | "full")
+# default: ファイル編集前に承認を求める
+# plan:    計画のみ（実行しない）
+# full:    自動実行（--dangerously-skip-permissions）
+permission_mode: full
+
+# TTS configuration is managed via environment variables.
+# See .env.example for available settings.

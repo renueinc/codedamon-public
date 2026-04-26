@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>コードだもん</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="icon" type="image/png" href="img/zundamon_icon.png">
+</head>
+<body>
+
+  <div id="panelA">
+  <div class="app-shell" id="appShell">
+  <div class="content">
+  <div class="header">
+    <img src="img/zundamon_icon.png" class="header-mascot" alt="ずんだもん">
+    <h1>コードだもん</h1>
+    <span class="header-status" id="statusText"><span class="dot ok"></span><span class="status-label">起動中なのだ...</span></span>
+    <div class="header-spacer"></div>
+    <div class="nav-menu-wrap">
+      <button class="btn nav-menu-btn" id="navMenuBtn" onclick="toggleNavMenu()" aria-label="メニュー">≡</button>
+      <div class="nav-actions" id="navActions">
+        <button class="btn" id="newChatBtn" onclick="newChat()">新規チャット</button>
+        <label class="toggle-label nav-toggle-label" id="splitToggleBtn" onclick="event.preventDefault();toggleSplit();">
+          <input type="checkbox" id="splitToggleCheck"><span class="toggle-switch"></span>分割
+        </label>
+        <label class="toggle-label nav-toggle-label" id="previewToggleBtn" onclick="event.preventDefault();togglePreview();">
+          <input type="checkbox" id="previewToggleCheck"><span class="toggle-switch"></span>プレビュー
+        </label>
+        <label class="toggle-label nav-toggle-label relay-toggle" id="relayToggle" onclick="event.preventDefault();toggleRelay();" title="ずんだもん同士で会話">
+          <input type="checkbox" id="relayToggleCheck"><span class="toggle-switch"></span>リレー
+        </label>
+        <div class="nav-actions-divider"></div>
+        <a class="nav-actions-credit" href="https://zunko.jp/" target="_blank" rel="noopener noreferrer">© 東北ずん子・ずんだもんプロジェクト</a>
+        <a class="nav-actions-credit" href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener noreferrer">VOICEVOX:ずんだもん</a>
+      </div>
+    </div>
+    <button class="btn help-btn" onclick="showHelpModal()" title="ヘルプ" aria-label="ヘルプ">?</button>
+    <div class="auth-info" id="authInfo">
+      <button class="btn" id="authBtn" onclick="showAuthModal()">ログイン</button>
+      <div class="header-divider" id="headerDivider" style="display:none"></div>
+      <div class="user-avatar" id="userAvatar" style="display:none" onclick="toggleUserDropdown()">?</div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-email" id="dropdownEmail"></div>
+        <div class="user-dropdown-usage">
+          <span id="dropdownUsageText">0 / 30 回（今月）</span>
+          <div class="usage-bar-track"><div class="usage-bar-fill" id="usageBarFill" style="width:0%"></div></div>
+        </div>
+        <div class="user-dropdown-plan" style="padding:10px 0 4px;border-top:1px solid #d1fae5;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:11px;color:#6b8a7a;font-weight:700;">プラン</span>
+            <span id="dropdownTier" style="font-size:14px;font-weight:800;color:#064e3b;">-</span>
+            <span id="dropdownTierBadge" style="display:none;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800;background:#dcfce7;color:#059669;border:1px solid #86efac;white-space:nowrap;">契約中</span>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn" id="dropdownUpgradeBtn" onclick="doUpgrade('plus')" style="flex:1;font-size:11px;padding:7px 12px;white-space:nowrap;">Plusにする</button>
+            <button class="btn" id="dropdownManageBtn" onclick="openBillingPortal()" style="display:none;flex:1;font-size:11px;padding:7px 12px;white-space:nowrap;">プランを管理</button>
+          </div>
+        </div>
+        <div class="user-dropdown-actions">
+          <button class="dropdown-btn" onclick="showAccountModal();closeUserDropdown()">アカウント</button>
+          <button class="dropdown-btn danger" onclick="doLogout()">ログアウト</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="chat-area" id="chatArea">
+      <div class="chat-mascot-bg"></div>
+      <div class="thinking-toast" id="thinkingToast">
+        <span class="thinking-dots"></span>
+        <span id="thinkingLabel">考え中なのだ...</span>
+      </div>
+      <div class="chat-inner" id="chatInner"></div>
+    </div>
+  </div>
+  <div class="input-area">
+    <div class="input-wrap" id="inputWrap">
+      <textarea id="msgInput" placeholder="メッセージを入力するなのだ... (Ctrl+Enter で送信)" rows="1"></textarea>
+      <div class="input-bottom-bar">
+        <div class="mode-picker-wrap" id="modePicker">
+          <button class="mode-picker-btn" id="modePickerBtn" onclick="toggleModeMenu()">
+            <span id="modePickerLabel">確認</span> <span style="font-size:9px;">▲</span>
+          </button>
+          <div class="mode-menu" id="modeMenu">
+            <button class="mode-menu-item active" data-mode="default" onclick="setMode('default')">
+              <span class="mode-menu-check">✓</span>
+              <div><div class="mode-menu-name">確認</div><div class="mode-menu-desc">編集前に承認を求めます</div></div>
+            </button>
+            <button class="mode-menu-item" data-mode="plan" onclick="setMode('plan')">
+              <span class="mode-menu-check"></span>
+              <div><div class="mode-menu-name">プラン</div><div class="mode-menu-desc">計画を立ててから実行します</div></div>
+            </button>
+            <button class="mode-menu-item" data-mode="full" onclick="setMode('full')">
+              <span class="mode-menu-check"></span>
+              <div><div class="mode-menu-name">自動</div><div class="mode-menu-desc">許可なしに自動実行します</div></div>
+            </button>
+          </div>
+        </div>
+        <button id="sendBtn">送信</button>
+      </div>
+    </div>
+  </div>
+  </div><!-- /.content -->
+  <div id="previewHandle"></div>
+  <aside id="previewPane">
+    <div class="preview-toolbar">
+      <input type="text" id="previewUrl" placeholder="http://localhost:3000" autocomplete="off">
+      <button class="btn" onclick="loadPreview()" title="開く">▶</button>
+      <button class="btn" onclick="reloadPreview()" title="リロード">⟳</button>
+      <button class="btn" onclick="togglePreviewOrientation()" title="横並び／縦並びを切替" id="previewOrientBtn">⇆</button>
+      <button class="btn" onclick="togglePreview()" title="閉じる">✕</button>
+    </div>
+    <div class="preview-blocked-msg" id="previewBlockedMsg" style="display:none">
+      空白の場合、サーバーが iframe を拒否している可能性があります。
+      <a id="previewNewTabLink" href="#" target="_blank" rel="noopener noreferrer" onclick="return openPreviewInTab()">新しいタブで開く →</a>
+    </div>
+    <div class="preview-empty" id="previewEmpty">
+      URLを入力して「開く」を押すのだ
+    </div>
+    <iframe id="previewFrame" referrerpolicy="no-referrer" style="display:none"
+      sandbox="allow-scripts allow-forms allow-popups"></iframe>
+  </aside>
+  </div><!-- /.app-shell -->
+
+  <div class="avatar-panel">
+    <div id="vtuberAvatar" class="vtuber-avatar">
+      <div class="vtuber-body" id="vtuberBody">
+        <img src="img/zundamon_icon.png" class="avatar-img visible" id="imgIdle" alt="ずんだもん">
+        <div class="vtuber-particles" id="vtuberParticles"></div>
+      </div>
+    </div>
+    <div class="av-status" id="avStatus">入力待ちなのだ</div>
+    <div id="avBtnRow" style="display:flex;align-items:center;gap:10px;margin-top:2px;">
+      <div class="av-btn-wrap">
+        <button id="micBtn" title="音声入力">🎤</button>
+        <span class="av-btn-label">マイク</span>
+      </div>
+      <div class="av-btn-wrap">
+        <button class="mute-btn" id="muteBtn" onclick="toggleMute()" aria-label="音声切替">🔊</button>
+        <span class="av-btn-label">音声</span>
+      </div>
+      <div class="av-btn-wrap">
+        <button class="speed-btn" id="speedBtn" onclick="cycleTTSSpeed()" aria-label="読み上げ速度">1×</button>
+        <span class="av-btn-label">速度</span>
+      </div>
+    </div>
+    <div class="voicevox-credit">
+      <div><a href="https://zunko.jp/" target="_blank" rel="noopener noreferrer">© 東北ずん子・ずんだもんプロジェクト</a></div>
+      <div><a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noopener noreferrer">VOICEVOX:ずんだもん</a></div>
+      <div><a href="https://renue.co.jp/services/codedamon" target="_blank" rel="noopener noreferrer">サービス紹介・お問い合わせ</a></div>
+      <div><a href="https://renue.co.jp/services/codedamon/tokushoho" target="_blank" rel="noopener noreferrer">特定商取引法に基づく表記</a></div>
+    </div>
+  </div>
+  </div><!-- /#panelA -->
+  <div id="splitHandle"></div>
+  <iframe id="panelB" title="2つ目のずんだもん"></iframe>
+
+  <!-- Auth Modal -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal" style="position:relative;padding:0;overflow:hidden;max-height:88vh;display:flex;flex-direction:column;">
+      <button class="modal-close" id="authModalClose" onclick="hideAuthModal()" style="z-index:2;">&times;</button>
+      <div style="overflow-y:auto;padding:32px;box-sizing:border-box;">
+      <h2 id="authModalTitle">🌱 ずんだもんとお話ししよう</h2>
+      <p id="authModalDesc">はじめての方は無料アカウント登録でずんだもんとの会話がはじめられるのだ！</p>
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tabRegister" onclick="switchAuthTab('register')">無料で登録</button>
+        <button class="modal-tab" id="tabLogin" onclick="switchAuthTab('login')">ログイン</button>
+      </div>
+      <input type="email" class="modal-input" id="authEmail" placeholder="メールアドレス">
+      <input type="password" class="modal-input" id="authPassword" placeholder="パスワード（12文字以上）">
+
+      <div id="authLegalSection" style="margin-top:8px;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:700;color:#064e3b;margin-bottom:6px;">利用規約・プライバシーポリシー（スクロールしてご確認ください）</div>
+        <div id="authLegalScroll" style="border:2px solid #bbf7d0;border-radius:12px;background:#ffffff;padding:14px 16px;max-height:220px;overflow-y:auto;font-size:11.5px;line-height:1.65;color:#064e3b;text-align:left;">
+          <h3 style="font-size:13px;font-weight:800;margin:0 0 4px;color:#059669;text-align:center;">利用規約</h3>
+          <p style="margin:0 0 10px;color:#6b8a7a;font-size:10.5px;text-align:center;">制定日：2026年4月21日 ／ 最終改定日：2026年4月22日 ／ 株式会社renue（以下「当社」）</p>
+
+          <p style="margin:0 0 8px;"><strong>1. 適用</strong><br>本規約は、当社が提供する「コードだもん」（以下「本サービス」）の利用条件を定めるものです。ユーザーは本規約およびプライバシーポリシーに同意のうえ本サービスを利用します。</p>
+
+          <p style="margin:0 0 8px;"><strong>2. サービスの内容</strong><br>本サービスは、利用者端末上で Claude Code CLI を起動し、ブラウザ上のチャット UI およびキャラクターアバター（ずんだもん）を通じて Claude とのやりとりを行う機能、音声合成（TTS）による読み上げ機能、利用プラン（Free／Plus）に応じた利用可能回数の提供などを行います。Claude とのやりとり（入出力）は利用者端末内でローカルに実行され、当社バックエンドへは送信・保存されません。</p>
+
+          <p style="margin:0 0 8px;"><strong>3. アカウント登録</strong><br>本サービスの利用にあたっては、メールアドレスおよびパスワードによる登録を行うものとします。ユーザーは真実かつ正確な情報を提供し、常に最新の状態を維持する責任を負います。登録情報に虚偽・誤記・記載漏れがある場合、本規約に違反したことがある場合、その他当社が登録を適当でないと判断した場合、当社は登録拒否・停止を行うことができ、その理由を開示する義務を負いません。</p>
+
+          <p style="margin:0 0 8px;"><strong>4. アカウント・APIキー・認証情報の管理</strong><br>ユーザーは、メールアドレス・パスワード・APIキー・セッション情報等の認証情報を自己の責任において適切に管理するものとし、第三者への利用許諾・貸与・譲渡・名義変更・売買・共有・公開を一切禁止します。認証情報の管理不十分、第三者の使用等によって生じた損害に関する責任はユーザーが負うものとし、当社は一切の責任を負いません。</p>
+
+          <p style="margin:0 0 8px;"><strong>5. 料金・プラン</strong><br>本サービスは無料プラン（Free）および有料プラン（Plus）を提供します。Plus プランは Stripe を通じた月額サブスクリプションであり、各プランの利用可能回数・料金・課金サイクルは本サービス上に表示するところによります。解約手続は Stripe のカスタマーポータル経由で行うことができ、既に発生した料金の返金は原則として行いません。支払いが滞った場合、当社は事前通知なく有料機能の提供を停止することができます。</p>
+
+          <p style="margin:0 0 8px;"><strong>6. 禁止事項</strong><br>ユーザーは以下の行為を行ってはなりません：法令または公序良俗に違反する行為、犯罪行為に関連する行為、他者の権利（知的財産権・肖像権・プライバシー・名誉その他）を侵害する行為、逆コンパイル等の改変、本サービスの運営を妨害する行為（過剰リクエスト、自動化ツールによる不正利用、スクレイピング等）、なりすまし、APIキーの再配布、反社会的勢力（暴力団、暴力団員、暴力団準構成員、総会屋、その他これらに準ずる者）に対して直接または間接に利益を供与する行為、その他当社が不適切と判断する行為。</p>
+
+          <p style="margin:0 0 8px;"><strong>7. 第三者サービス連携</strong><br>本サービスの提供にあたり、当社は以下の第三者サービスと連携します。ユーザーは本サービスの利用に際し、これらサービスへの必要な情報送信に同意するものとします。<br>・決済処理: Stripe（メールアドレス、顧客ID、サブスクリプション情報を送信）<br>・音声合成: VOICEVOX（読み上げ対象のテキストを送信し、生成された音声データを取得します。当該テキストは当社データベースに保存しません）</p>
+
+          <p style="margin:0 0 8px;"><strong>8. 知的財産権およびアバター素材</strong><br>本サービスおよび本サービスに関連する一切の情報（テキスト、画像、プログラム等を含みます。）についての著作権を含む知的財産権は、当社または当社にその利用を許諾した権利者に帰属します。ユーザーは、当社の事前の書面による承諾なく、本サービスに関する知的財産を利用（複製、転載、改変、再配布等を含みます。）してはなりません。なお、キャラクター「ずんだもん」を含むアバター素材の利用にあたっては、提供元が定める二次利用ガイドライン（<a href="https://zunko.jp/" target="_blank" rel="noopener" style="color:#059669;font-weight:700;">https://zunko.jp/</a>）を遵守するものとします。</p>
+
+          <p style="margin:0 0 8px;"><strong>9. 不正利用に対する法的措置</strong><br>規約違反または違反の疑いがある場合、当社はアクセスログ等の保存・調査、警察等公的機関への通報、民事上の措置（損害賠償請求、差止請求等）、刑事上の措置（刑事告発・告訴等）を講じます。</p>
+
+          <p style="margin:0 0 8px;"><strong>10. 利用制限・登録抹消</strong><br>違反またはそのおそれがある場合、当社は事前通知なく利用制限・アカウント凍結・登録抹消・APIキー無効化を行えます。これにより当該ユーザーに生じた損害について、当社は一切の責任を負いません。</p>
+
+          <p style="margin:0 0 8px;"><strong>11. 退会</strong><br>ユーザーは、当社所定の手続により、本サービスから退会することができます。退会後、当該アカウントに関連する本サービスの利用は停止されます。退会後のデータの取扱いについては、当社プライバシーポリシーに従います。有料プランに加入中のユーザーは、退会前に Stripe のカスタマーポータル等により有料プランの解約手続を完了するものとします。</p>
+
+          <p style="margin:0 0 8px;"><strong>12. サービス提供の停止</strong><br>メンテナンス、不可抗力、通信障害その他当社が必要と判断した場合、事前通知なくサービスの全部または一部を停止・中断できます。停止・中断により生じた損害について、当社は一切の責任を負いません。</p>
+
+          <p style="margin:0 0 8px;"><strong>13. 免責</strong><br>本サービスは「現状有姿」で提供され、正確性・完全性・特定目的への適合性・継続性について保証しません。当社は故意または重過失がある場合を除き、利用または利用不能により生じた損害について責任を負いません。</p>
+
+          <p style="margin:0 0 8px;"><strong>14. 損害賠償</strong><br>ユーザーの規約違反により当社に損害が生じた場合、ユーザーは弁護士費用・調査費用を含む一切の損害を賠償する責任を負います。</p>
+
+          <p style="margin:0 0 8px;"><strong>15. 通知または連絡</strong><br>ユーザーと当社との間の通知または連絡は、当社が定める方法により行います。当社は、ユーザーから別途届出がない限り、現在登録されているメールアドレスに連絡事項を送信することにより通知を行ったものとみなします。</p>
+
+          <p style="margin:0 0 8px;"><strong>16. 権利義務の譲渡禁止</strong><br>ユーザーは、当社の書面による事前の承諾なく、本規約に基づく権利義務または利用契約上の地位を第三者に譲渡し、または担保に供することはできません。</p>
+
+          <p style="margin:0 0 8px;"><strong>17. 規約の変更</strong><br>当社は必要と判断した場合、事前通知なく本規約を変更できます。変更後にサービスを利用したユーザーは変更後の規約に同意したものとみなします。</p>
+
+          <p style="margin:0 0 8px;"><strong>18. 準拠法・管轄</strong><br>日本法に準拠し、紛争が生じた場合は東京地方裁判所を第一審の専属的合意管轄裁判所とします。</p>
+
+          <p style="margin:0 0 14px;"><strong>19. お問い合わせ窓口</strong><br>本規約に関するお問い合わせは下記までお願いします。<br>株式会社renue<br>〒105-7105 東京都港区東新橋1-5-2 汐留シティセンター5階WORKSTYLING内<br>Eメール: info@renue.co.jp</p>
+
+          <h3 style="font-size:13px;font-weight:800;margin:16px 0 8px;color:#059669;border-top:1px dashed #bbf7d0;padding-top:14px;text-align:center;">プライバシーポリシー</h3>
+          <p style="margin:0 0 10px;">個人情報の取扱いについては、株式会社renueのプライバシーポリシーをご確認ください。<br><a href="https://renue.co.jp/privacy" target="_blank" rel="noopener" style="color:#059669;font-weight:700;">https://renue.co.jp/privacy</a> <span style="color:#6b8a7a;">（別タブで開きます）</span></p>
+
+          <h3 style="font-size:13px;font-weight:800;margin:16px 0 8px;color:#059669;border-top:1px dashed #bbf7d0;padding-top:14px;text-align:center;">特定商取引法に基づく表記</h3>
+          <p style="margin:0 0 10px;">Plus プラン等の有料サービスに関する事業者情報・販売条件・解約方法については、特定商取引法に基づく表記をご確認ください。<br><a href="https://renue.co.jp/services/codedamon/tokushoho" target="_blank" rel="noopener" style="color:#059669;font-weight:700;">特定商取引法に基づく表記</a> <span style="color:#6b8a7a;">（別タブで開きます）</span></p>
+
+          <h3 style="font-size:13px;font-weight:800;margin:16px 0 8px;color:#059669;border-top:1px dashed #bbf7d0;padding-top:14px;text-align:center;">サービス紹介・お問い合わせ</h3>
+          <p style="margin:0;">サービスの詳細、最新情報、お問い合わせは下記サービスページからご確認いただけます。<br><a href="https://renue.co.jp/services/codedamon" target="_blank" rel="noopener" style="color:#059669;font-weight:700;">コードだもん サービスページ</a> <span style="color:#6b8a7a;">（別タブで開きます）</span></p>
+        </div>
+        <label id="authAgreeLabel" style="display:flex;align-items:flex-start;gap:8px;margin-top:10px;font-size:12px;color:#064e3b;cursor:pointer;user-select:none;">
+          <input type="checkbox" id="authAgree" onchange="updateAuthSubmitState()" style="margin-top:2px;flex-shrink:0;">
+          <span>上記の<strong>利用規約</strong>および<strong>プライバシーポリシー</strong>に同意します</span>
+        </label>
+      </div>
+
+      <button class="modal-submit" id="authSubmit" onclick="doAuth()" disabled>無料で登録する</button>
+      <div class="modal-error" id="authError"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upgrade Modal -->
+  <div class="modal-overlay" id="upgradeModal">
+    <div class="modal" style="position:relative">
+      <button class="modal-close" onclick="hideUpgradeModal()">&times;</button>
+      <h2>今月の上限に達したのだ</h2>
+      <p>無料プランは月30回までなのだ。もっと使うにはアップグレードするのだ！</p>
+      <ul class="upgrade-features">
+        <li><strong>Plus</strong> — 月300回</li>
+      </ul>
+      <button class="modal-submit" id="upgradeBtnPlus" onclick="doUpgrade('plus')">Plusにする</button>
+      <div class="modal-error" id="upgradeError"></div>
+    </div>
+  </div>
+
+  <!-- Account Modal -->
+  <div class="modal-overlay" id="accountModal">
+    <div class="modal" style="position:relative;padding:0;overflow:hidden;max-height:88vh;display:flex;flex-direction:column;">
+      <button class="modal-close" onclick="hideAccountModal()" style="z-index:2;">&times;</button>
+      <div style="overflow-y:auto;padding:32px;box-sizing:border-box;">
+      <h2>アカウント情報</h2>
+      <div style="text-align:left;">
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:700;color:#6b8a7a;margin-bottom:4px;">メールアドレス</div>
+          <div id="accountEmail" style="font-size:14px;color:#064e3b;font-weight:700;"></div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:700;color:#6b8a7a;margin-bottom:4px;">使用状況</div>
+          <div id="accountUsage" style="font-size:14px;color:#064e3b;font-weight:700;">読み込み中なのだ...</div>
+        </div>
+        <div style="margin-bottom:18px;">
+          <div style="font-size:11px;font-weight:700;color:#6b8a7a;margin-bottom:4px;">プラン</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div id="accountTier" style="font-size:14px;color:#064e3b;font-weight:700;">-</div>
+            <span id="accountTierBadge" style="display:none;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:800;background:#dcfce7;color:#059669;border:1px solid #86efac;">契約中</span>
+          </div>
+          <div id="accountPlanActions" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn" id="accountUpgradeBtn" onclick="doUpgrade('plus')" style="font-size:11px;padding:6px 12px;">Plusにする</button>
+            <button class="btn" id="managePlanBtn" onclick="openBillingPortal()" style="display:none;font-size:11px;padding:6px 12px;">プランを管理</button>
+          </div>
+          <div id="accountPlanError" style="font-size:11px;color:#b91c1c;margin-top:6px;min-height:14px;"></div>
+        </div>
+        <hr style="border:none;border-top:1px solid #bbf7d0;margin:4px 0 18px;">
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:700;color:#6b8a7a;margin-bottom:4px;">APIキー</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <code id="accountApiKey" style="flex:1;font-family:'SF Mono',Menlo,monospace;font-size:12px;background:#dcfce7;padding:8px 12px;border-radius:8px;color:#064e3b;word-break:break-all;border:1px solid #bbf7d0;"></code>
+            <button class="btn" onclick="copyApiKey()" id="copyKeyBtn" style="white-space:nowrap;font-size:11px;padding:6px 12px;">コピー</button>
+          </div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <button class="btn" onclick="copyEnvBlock()" id="copyEnvBtn" style="font-size:11px;padding:6px 12px;">.env 形式でコピー</button>
+          <button class="btn" onclick="downloadEnvBlock()" id="downloadEnvBtn" style="font-size:11px;padding:6px 12px;margin-left:6px;">.env としてダウンロード</button>
+        </div>
+
+        <div style="margin:18px 0 14px;padding:14px 16px;border:2px solid #bbf7d0;border-radius:12px;background:#f0fdf4;">
+          <div style="font-size:13px;font-weight:800;color:#059669;margin-bottom:10px;">📘 はじめての方向け：サーバーURLの設定方法</div>
+          <div style="font-size:12px;color:#064e3b;line-height:1.75;">
+            <ol style="margin:8px 0 8px 20px;padding:0;">
+              <li>プロジェクトのルートフォルダ（<code style="background:#dcfce7;padding:1px 6px;border-radius:4px;">start.sh</code> があるフォルダ）を開く</li>
+              <li>同じフォルダにある <code style="background:#dcfce7;padding:1px 6px;border-radius:4px;">.env.local</code> をテキストエディタで開く<br><span style="color:#6b8a7a;font-size:11px;">※ 見つからない場合は新規作成してください</span></li>
+              <li>ファイルに次の1行を追加（URLは上の欄の値）<br>
+                <code style="display:block;margin-top:4px;padding:8px 10px;background:#064e3b;color:#bbf7d0;border-radius:6px;font-size:11.5px;word-break:break-all;">CLOUD_BACKEND_URL=&lt;サーバーURL&gt;</code>
+              </li>
+              <li>保存してから <code style="background:#dcfce7;padding:1px 6px;border-radius:4px;">bash start.sh</code> を再実行してサーバーを再起動</li>
+            </ol>
+            <div style="margin-top:8px;padding:8px 10px;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;font-size:11px;color:#78350f;">
+              💡 上の「<strong>.env 形式でコピー</strong>」ボタンで <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;">CLOUD_BACKEND_URL=...</code> をクリップボードにコピーできます。「<strong>.env としてダウンロード</strong>」でファイルとして保存する場合は、ダウンロードした <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;">.env.zundamon</code> を <code style="background:#fef3c7;padding:1px 4px;border-radius:3px;">.env.local</code> にリネームしてください。
+            </div>
+          </div>
+        </div>
+
+        <div class="account-section" id="accountPasswordSection">
+          <div class="account-section-title">🔐 パスワード変更</div>
+          <input type="password" class="modal-input" id="currentPassword" placeholder="現在のパスワード">
+          <input type="password" class="modal-input" id="newPassword" placeholder="新しいパスワード（12文字以上）">
+          <input type="password" class="modal-input" id="newPasswordConfirm" placeholder="新しいパスワード（確認）">
+          <button class="modal-submit" id="changePasswordBtn" onclick="doChangePassword()">パスワードを変更する</button>
+          <div class="modal-error" id="changePasswordError"></div>
+          <div class="modal-success" id="changePasswordSuccess"></div>
+        </div>
+
+        <div class="account-danger-zone">
+          <div class="account-section-title danger">⚠️ アカウント削除</div>
+          <p class="account-danger-desc">アカウントを削除すると、ユーザー情報・使用履歴がすべて消え、契約中のサブスクは解約されます。この操作は取り消せません。</p>
+          <button class="btn btn-danger" id="openDeleteAccountBtn" onclick="showDeleteAccountModal()">アカウントを削除する</button>
+        </div>
+
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Account Confirmation Modal -->
+  <div class="modal-overlay" id="deleteAccountModal">
+    <div class="modal" style="position:relative;max-width:420px;">
+      <button class="modal-close" onclick="hideDeleteAccountModal()">&times;</button>
+      <h2>本当に削除しますか？</h2>
+      <p style="font-size:13px;color:#064e3b;margin-bottom:12px;">この操作は取り消せません。以下がすべて削除されます:</p>
+      <ul style="text-align:left;font-size:12px;color:#064e3b;margin:0 0 14px 20px;padding:0;line-height:1.8;">
+        <li>ユーザー情報・APIキー</li>
+        <li>使用履歴</li>
+        <li>契約中のStripeサブスクは自動解約</li>
+      </ul>
+      <input type="password" class="modal-input" id="deleteAccountPassword" placeholder="確認のため現在のパスワードを入力">
+      <div style="display:flex;gap:10px;">
+        <button class="btn" onclick="hideDeleteAccountModal()" style="flex:1;">キャンセル</button>
+        <button class="btn btn-danger" id="deleteAccountConfirmBtn" onclick="doDeleteAccount()" style="flex:1;">削除する</button>
+      </div>
+      <div class="modal-error" id="deleteAccountError"></div>
+    </div>
+  </div>
+
+  <!-- Register Success Modal -->
+  <div class="modal-overlay" id="registerSuccessModal">
+    <div class="modal" style="position:relative;max-width:360px;text-align:center;">
+      <h2>🎉 登録が完了しました</h2>
+      <p style="font-size:13px;color:#064e3b;margin-bottom:18px;">ご登録のメールアドレスとパスワードでログインしてください。</p>
+      <button class="modal-submit" onclick="onRegisterSuccessDone()">ログイン画面へ</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="helpModal">
+    <div class="modal" style="position:relative;padding:0;overflow:hidden;max-height:80vh;">
+      <button class="modal-close" onclick="hideHelpModal()">&times;</button>
+      <div style="overflow-y:auto;max-height:80vh;padding:32px;box-sizing:border-box;">
+        <h2>❓ コードだもんの使い方</h2>
+        <p>ずんだもんと一緒にコードを書こうなのだ！</p>
+        <div class="help-sections">
+          <div class="help-section">
+            <div class="help-section-title">🗣️ チャット</div>
+            <ul class="help-list">
+              <li>メッセージを入力して <strong>送信</strong> または <strong>Ctrl+Enter</strong></li>
+              <li>ずんだもんが回答して音声で読み上げます</li>
+              <li>🎤 ボタンでマイク入力も使えます</li>
+            </ul>
+          </div>
+          <div class="help-section">
+            <div class="help-section-title">🛠️ 3つのモード</div>
+            <ul class="help-list">
+              <li><strong>確認</strong> — ファイル編集前に承認を求めます（推奨）</li>
+              <li><strong>プラン</strong> — 計画のみ立てて実行しません</li>
+              <li><strong>自動</strong> — 確認なしで自動実行します</li>
+            </ul>
+          </div>
+          <div class="help-section">
+            <div class="help-section-title">🔊 音声</div>
+            <ul class="help-list">
+              <li>🔊 / 🔇 ボタンで音声のオン・オフを切り替えます</li>
+              <li>無料プランは月30回まで音声を使えます</li>
+            </ul>
+          </div>
+          <div class="help-section">
+            <div class="help-section-title">🌐 プレビュー</div>
+            <ul class="help-list">
+              <li>ヘッダの <strong>プレビュー</strong> ボタンで、任意の URL を画面内フレームで表示できます</li>
+              <li>ずんだもんに Web ページを作ってもらったとき、隣で確認するのに便利なのだ</li>
+            </ul>
+          </div>
+          <div class="help-section">
+            <div class="help-section-title">🪟 分割</div>
+            <ul class="help-list">
+              <li>ヘッダの <strong>分割</strong> ボタンで、もう1つのチャットパネルを横に開きます (右は iframe)</li>
+              <li>2つの作業を並行して進めたいときに使ってね</li>
+            </ul>
+          </div>
+          <div class="help-section">
+            <div class="help-section-title">🔁 リレー</div>
+            <ul class="help-list">
+              <li>まず <strong>分割</strong> ボタンで2つのチャットパネルを開いてください — 分割モードが有効でないとリレーは使えません</li>
+              <li>両方のパネルで <strong>🔁 リレー</strong> を ON にすると、ずんだもん同士が自動で会話を続けます</li>
+              <li>片方の応答が自動でもう片方に送信されます — <strong>最大 6 ターン</strong>で自動停止します</li>
+              <li>リレーを止めるには <strong>🔁 リレー</strong> を OFF にするか、<strong>新規チャット</strong> を押してください</li>
+            </ul>
+          </div>
+          <div class="help-section">
+            <div class="help-section-title">👤 アカウント</div>
+            <ul class="help-list">
+              <li>無料登録で月50リクエスト使えます</li>
+              <li>アバターをクリック → アカウント で使用状況を確認</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Chat Confirmation Modal -->
+  <div class="modal-overlay" id="newChatModal">
+    <div class="modal" style="position:relative;max-width:360px;text-align:center;">
+      <h2 style="margin-bottom:10px;">新規チャット</h2>
+      <p style="font-size:13px;color:#064e3b;margin-bottom:20px;">現在の会話がすべて削除されます。<br>よろしいですか？</p>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button class="btn" onclick="hideNewChatModal()" style="min-width:90px;">キャンセル</button>
+        <button class="btn btn-danger" onclick="confirmNewChat()" style="min-width:90px;">削除して開始</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/spring.js"></script>
+  <script src="js/avatar.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/relay.js"></script>
+  <script src="js/preview.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
