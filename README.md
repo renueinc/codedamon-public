@@ -1,78 +1,78 @@
 <div align="center">
 
-# codedamon (コードだもん)
+# コードだもん (codedamon)
 
-**Talk to Claude Code through Zundamon — your AI coding companion with a voice.**
+**ずんだもんと一緒にClaude Codeを使うのだ！**
 
-Chat with Claude Code via a cute Zundamon avatar interface. Voice input, voice output, spring physics animations. Zero dependencies.
+Claude Codeのチャットインターフェースに、ずんだもんのアバターと音声を搭載。音声入力・音声出力対応。依存パッケージゼロ。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)]()
 [![Claude Code](https://img.shields.io/badge/Claude_Code-required-blue)]()
 
-[English](README.md) | [Japanese](README_ja.md)
+[English](README_en.md) | [日本語](README.md)
 
 </div>
 
-> **Note:** This repository contains only the local chat UI (`server/` + `public/`). The cloud backend implementation (auth, billing, rate-limiting) that powers [codedamon.renue.co.jp](https://codedamon.renue.co.jp) is managed separately by [renue Inc.](https://renue.co.jp) and is not included here.
+> **注記:** このリポジトリにはローカル実行用のチャットUI（`server/` + `public/`）のみが含まれています。[codedamon.renue.co.jp](https://codedamon.renue.co.jp) を動かすクラウドバックエンド（認証・課金・レート制限等）は株式会社renueが別途管理しており、本リポジトリには含まれていません。
 
 ---
 
-## Quick Start
+## クイックスタート
 
-**Requirements:** Node.js 18+, [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)
+**必要なもの:** Node.js 18以上, [Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)
 
 ```bash
 git clone https://github.com/renueinc/codedamon
 cd codedamon
-bash setup.sh       # one-time setup
-bash start.sh       # launch → opens browser
+bash setup.sh       # 初回セットアップ
+bash start.sh       # 起動 → ブラウザが開く
 ```
 
-That's it. Chat with Claude Code through Zundamon.
+これだけ。ずんだもん経由でClaude Codeとチャットできます。
 
 ---
 
-## What is this?
+## これは何？
 
-A web-based chat UI that connects to Claude Code with a Zundamon character avatar.
+Claude Codeにずんだもんアバターを搭載したWebチャットUI。
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  Browser (localhost:3456)                       │
+│  ブラウザ (localhost:3456)                       │
 │  ┌────────────────────┐  ┌──────────────────┐   │
-│  │                    │  │   Zundamon       │   │
-│  │   Chat messages    │  │   Avatar         │   │
-│  │   (streaming)      │  │   (animated)     │   │
+│  │                    │  │   ずんだもん     │   │
+│  │   チャット         │  │   アバター       │   │
+│  │   (ストリーミング)  │  │   (アニメーション) │  │
 │  │                    │  │                  │   │
 │  └────────────────────┘  └──────────────────┘   │
-│  [Message input...              ] [🎤] [Send]   │
+│  [メッセージを入力...           ] [🎤] [送信]   │
 └─────────────────────────────────────────────────┘
          │                    │
          ▼                    ▼
-   claude CLI (local)    TTS API (optional)
+   claude CLI (ローカル)  TTS API (オプション)
 ```
 
-### Features
+### 機能
 
-- **Chat with Claude Code** — Full Claude Code power through a web UI
-- **Zundamon avatar** — Animated character with idle, thinking, talking, happy, error states
-- **Voice output** — Zundamon reads responses aloud (optional, requires TTS setup)
-- **Voice input** — Speak your messages using browser speech recognition
-- **Session persistence** — Conversations resume across page reloads
-- **Tool visualization** — See which tools Claude uses (Read, Write, Bash, etc.)
-- **Zero dependencies** — Pure Node.js built-in modules only
+- **Claude Codeとチャット** — Claude Codeのフルパワーをウェブ UI で
+- **ずんだもんアバター** — アイドル・考え中・おしゃべり・喜び・エラーの表情切替
+- **音声出力** — ずんだもんがレスポンスを読み上げ（TTS設定が必要）
+- **音声入力** — ブラウザの音声認識でメッセージを話して入力
+- **セッション維持** — ページ再読み込み後も会話を再開
+- **ツール可視化** — Claudeが使うツール（Read, Write, Bash等）を表示
+- **依存パッケージゼロ** — Node.js組み込みモジュールのみ
 
 ---
 
-## Voice Setup (Optional)
+## 音声設定（オプション）
 
-Voice is optional. The chat and avatar work perfectly without it.
+音声はオプションです。設定なしでもチャットとアバターは動きます。
 
-### Option 1: Fish Audio (Bring Your Own Key)
+### 方法1: Fish Audio（自分のAPIキーを使用）
 
-1. Get an API key at [fish.audio](https://fish.audio)
-2. Edit `config/settings.yaml`:
+1. [fish.audio](https://fish.audio) でAPIキーを取得
+2. `config/settings.yaml` を編集:
 
 ```yaml
 tts:
@@ -81,21 +81,21 @@ tts:
   fish_audio_model: "your_model_id"
 ```
 
-3. Restart the server
+3. サーバーを再起動
 
-### Option 2: Cloud Proxy (Managed)
+### 方法2: クラウドプロキシ（マネージド）
 
-Coming soon. Managed TTS service with pay-as-you-go billing.
+近日公開予定。従量課金のマネージドTTSサービス。
 
 ---
 
-## Configuration
+## 設定
 
-All settings are in `config/settings.yaml`:
+すべての設定は `config/settings.yaml`:
 
 ```yaml
-port: 3456                    # Server port
-cwd: /path/to/your/project    # Default working directory
+port: 3456                    # サーバーポート
+cwd: /path/to/your/project    # デフォルト作業ディレクトリ
 
 tts:
   provider: none              # none | fish-audio | cloud
@@ -103,82 +103,81 @@ tts:
 
 ---
 
-## Requirements
+## 動作要件
 
-| Requirement | Version | How to check |
-|-------------|---------|-------------|
-| **Node.js** | 18+ | `node --version` |
-| **Claude Code** | any | `claude --version` |
+| 要件 | バージョン | 確認方法 |
+|------|-----------|---------|
+| **Node.js** | 18以上 | `node --version` |
+| **Claude Code** | 任意 | `claude --version` |
 
-### Installing Claude Code
+### Claude Codeのインストール
 
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
 
-Or see the [official docs](https://docs.anthropic.com/en/docs/claude-code/overview) for other installation methods (Homebrew, desktop app, etc.).
+その他のインストール方法（Homebrew、デスクトップアプリ等）は[公式ドキュメント](https://docs.anthropic.com/en/docs/claude-code/overview)を参照。
 
 ---
 
-## Troubleshooting
+## トラブルシューティング
 
-### `claude` CLI not found / ENOENT error
+### `claude` CLIが見つからない / ENOENTエラー
 
-The server needs to find the `claude` command. It searches in this order:
+サーバーは `claude` コマンドを以下の順で検索します:
 
-1. `CLAUDE_PATH` environment variable (if set)
-2. System PATH (`which claude` / `where claude`)
-3. Common locations (`/usr/local/bin/claude`, `~/.npm-global/bin/claude`, etc.)
+1. `CLAUDE_PATH` 環境変数（設定されている場合）
+2. システムPATH（`which claude`）
+3. よくあるインストール先（`/usr/local/bin/claude`、`~/.npm-global/bin/claude` 等）
 
-**If you installed Claude Code via desktop app or a non-standard location**, set the path explicitly:
+**デスクトップアプリや特殊な場所にインストールした場合**、パスを明示指定してください:
 
 ```bash
-# Find where claude is installed
-which claude           # macOS/Linux
-where claude           # Windows
+# claudeの場所を確認
+which claude
 
-# Set it explicitly
+# 明示指定して起動
 export CLAUDE_PATH=/your/path/to/claude
 bash start.sh
 ```
 
-Or add it to `~/.bashrc` / `~/.zshrc`:
+`~/.bashrc` や `~/.zshrc` に書いておくと毎回設定不要です:
 
 ```bash
 export CLAUDE_PATH=/Applications/cmux.app/Contents/Resources/bin/claude
 ```
 
-### Port already in use
+### ポートが使用中
 
-Edit `config/settings.yaml` and change the port number, then restart:
+`config/settings.yaml` でポート番号を変更してサーバーを再起動:
 
 ```yaml
 port: 3457
 ```
 
-### Windows users
+### Windowsユーザー
 
-`setup.sh` requires bash. Follow these steps manually instead:
+`setup.sh` はbashが必要です。代わりに以下の手順を手動で行ってください:
 
-**1. Create `config/settings.yaml`** (copy from `config/settings.yaml.example` or create it):
+**1. `config/settings.yaml` を作成する**（`config/settings.yaml.example` をコピーするか新規作成）:
 
 ```yaml
 port: 3456
-cwd: C:\path\to\your\project
+cwd: C:\作業フォルダのパス
 
 tts:
-  provider: cloud   # or none
+  provider: cloud   # または none
 ```
 
-**2. Create `.env.local`** in the project root with your backend URL:
+**2. プロジェクトルートに `.env.local` を作成する**:
 
 ```
 CLOUD_BACKEND_URL=https://your-backend-url
 ```
 
-> If you downloaded a `.env.zundamon` file from the account screen, rename it to `.env.local` and place it in the project root. The `CLOUD_API_KEY` inside is stored automatically in your browser — you do not need it in this file. Only `CLOUD_BACKEND_URL` is required here.
+> アカウント画面から `.env.zundamon` ファイルをダウンロードした場合は、`.env.local` にリネームしてプロジェクトルートに置いてください。ファイル内の `CLOUD_API_KEY` はログイン後にブラウザへ自動保存されるため、このファイルへの記載は不要です。必要なのは `CLOUD_BACKEND_URL` のみです。
 
-**3. Start the server** using Git Bash, WSL, or any terminal:
+**3. サーバーを起動する**（Git Bash、WSL、またはターミナルから）:
 
 ```bash
 node server/serve.js --port 3456 --public ./public --config ./config/settings.yaml
@@ -186,28 +185,14 @@ node server/serve.js --port 3456 --public ./public --config ./config/settings.ya
 
 ---
 
-## Architecture
+## キャラクター素材
 
-| Component | Description |
-|-----------|-------------|
-| `server/serve.js` | Node.js HTTP server (zero deps) |
-| `public/index.html` | Single-file frontend (~900 lines) |
-| `config/settings.yaml` | User configuration |
-| `setup.sh` | First-time setup script |
-| `start.sh` | Launch script |
+ずんだもんの素材は [zunko.jp](https://zunko.jp/) の公式素材を使用しています。
 
-The server binds to `127.0.0.1` only (localhost). No network exposure.
+利用にあたっては [ガイドライン](https://zunko.jp/guideline.html) をご確認ください。
 
 ---
 
-## Character Assets
+## ライセンス
 
-Zundamon character assets are from [zunko.jp](https://zunko.jp/) official materials.
-
-Please review the [Zundamon guidelines](https://zunko.jp/guideline.html) for usage terms.
-
----
-
-## License
-
-MIT — see [LICENSE](LICENSE)
+MIT — [LICENSE](LICENSE) を参照
