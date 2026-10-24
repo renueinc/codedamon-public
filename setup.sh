@@ -53,11 +53,10 @@ log_info "OS: $OS_NAME $OS_VERSION"
 # Node.js
 if command -v node &>/dev/null; then
     NODE_VERSION="$(node --version)"
-    NODE_MAJOR="$(echo "$NODE_VERSION" | sed 's/v//' | cut -d. -f1)"
-    if [ "$NODE_MAJOR" -ge 18 ]; then
+    if node -e 'const [major, minor, patch] = process.versions.node.split(".").map(Number); const minimum = new Map([[22, [23, 4]], [24, [22, 1]], [26, [12, 1]]]).get(major); if (!minimum || minor < minimum[0] || (minor === minimum[0] && patch < minimum[1])) process.exit(1);'; then
         log_success "Node.js: $NODE_VERSION"
     else
-        log_error "Node.js $NODE_VERSION is too old. Version 18+ required."
+        log_error "Node.js $NODE_VERSION is unsupported. Use 22.23.4+ (22.x), 24.22.1+ (24.x), or 26.12.1+ (26.x)."
         HAS_ERROR=true
     fi
 else
